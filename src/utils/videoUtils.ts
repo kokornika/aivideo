@@ -1,7 +1,13 @@
 import { toast } from '../components/Toast';
 import { generateVideoWithHunyuan } from '../services/hunyuanApi';
+import { useVideoLibrary } from '../hooks/useVideoLibrary';
 
-export async function generateStoryboard(description: string): Promise<void> {
+export async function generateStoryboard(
+  description: string,
+  hardwareConfig: string
+): Promise<void> {
+  const { addVideo } = useVideoLibrary();
+
   try {
     if (!description.trim()) {
       toast.error('Kérlek, add meg a videó leírását');
@@ -10,13 +16,18 @@ export async function generateStoryboard(description: string): Promise<void> {
 
     toast.info('Videó generálása folyamatban... (Ez eltarthat néhány percig)');
     
-    const result = await generateVideoWithHunyuan(description);
+    const result = await generateVideoWithHunyuan(description, hardwareConfig);
     
     if (result.status === 'succeeded') {
       if (result.output) {
         toast.success('A videó sikeresen elkészült!');
-        console.log('Generált videó URL:', result.output);
-        // Itt kezelhetnénk a generált videót, pl. megjelenítés vagy letöltés
+        // Hozzáadjuk az új videót a könyvtárhoz
+        addVideo({
+          title: description.slice(0, 50) + (description.length > 50 ? '...' : ''),
+          thumbnail: result.output,
+          createdAt: new Date().toISOString(),
+          url: result.output
+        });
       } else {
         toast.error('A videó generálása sikeres, de nem kaptunk vissza URL-t');
       }

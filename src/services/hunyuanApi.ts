@@ -11,6 +11,7 @@ interface PredictionResponse {
 
 interface VideoGenerationParams {
   prompt: string;
+  hardware_config?: 'gpu-h100' | 'gpu-h100-2x' | 'gpu-h100-4x' | 'gpu-h100-8x';
   seed?: number;
   width?: number;
   height?: number;
@@ -22,11 +23,12 @@ interface VideoGenerationParams {
 }
 
 const DEFAULT_PARAMS: Partial<VideoGenerationParams> = {
+  hardware_config: 'gpu-h100',
   width: 854,
   height: 480,
-  flow_shift: 7,
-  infer_steps: 50,
-  video_length: 129,
+  flow_shift: 5,
+  infer_steps: 30,
+  video_length: 64,
   embedded_guidance_scale: 6
 };
 
