@@ -9,7 +9,7 @@ export function useVideoDescription() {
   const [videoParams, setVideoParams] = useState<Partial<VideoGenerationParams>>({
     width: 854,
     height: 480,
-    video_length: 65,  // video_length-1 legyen 4 többszöröse (64)
+    video_length: 69,  // video_length-1 legyen 4 többszöröse (68)
     infer_steps: 50,
     seed: Math.floor(Math.random() * 1000000),
     negative_prompt: ''
@@ -21,8 +21,8 @@ export function useVideoDescription() {
     try {
       setIsGenerating(true);
       await generateStoryboard(description, {
-        ...videoParams,
-        hardware_config: selectedHardware as VideoGenerationParams['hardware_config']
+        hardware_config: selectedHardware as VideoGenerationParams['hardware_config'],
+        ...videoParams
       });
     } catch (error) {
       console.error('Failed to generate video:', error);

@@ -76,10 +76,10 @@ export function VideoEditor() {
           <div className="relative group/hardware">
             <ToolButton 
               icon={Cpu} 
-              label={HARDWARE_OPTIONS.find(opt => opt.value === selectedHardware)?.label || 'GPU'}
+              label={HARDWARE_OPTIONS.find(opt => opt.value === selectedHardware)?.label || 'H100 GPU'}
               tooltip="Hardver konfiguráció"
             />
-            <div className="fixed bottom-[calc(100%+0.5rem)] right-0 w-64 bg-gray-800 rounded-lg shadow-xl opacity-0 group-hover/hardware:opacity-100 transition-opacity pointer-events-none group-hover/hardware:pointer-events-auto z-50">
+            <div className="absolute top-0 right-0 transform -translate-y-full mt-1 w-64 bg-gray-800 rounded-lg shadow-xl opacity-0 group-hover/hardware:opacity-100 transition-opacity pointer-events-none group-hover/hardware:pointer-events-auto z-50">
               {HARDWARE_OPTIONS.map((option) => (
                 <button
                   key={option.value}
@@ -92,6 +92,7 @@ export function VideoEditor() {
                   <span className="text-sm opacity-75">{option.price}</span>
                 </button>
               ))}
+              <div className="absolute w-full h-2 top-full bg-transparent" />
             </div>
           </div>
           <button 
