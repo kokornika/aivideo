@@ -5,16 +5,20 @@ import react from '@vitejs/plugin-react';
 export default defineConfig({
   plugins: [react()],
   optimizeDeps: {
-    exclude: ['lucide-react'],
+    exclude: ['lucide-react']
   },
   server: {
     proxy: {
       '/api/replicate': {
-        target: 'https://api.replicate.com/v1',
+        target: 'https://api.replicate.com',
         changeOrigin: true,
         secure: false,
-        headers: {
-          'Authorization': `Bearer ${process.env.VITE_REPLICATE_API_TOKEN}`
+        rewrite: (path) => path.replace(/^\/api\/replicate/, '/v1'),
+        configure: (proxy) => {
+          proxy.on('proxyReq', (proxyReq) => {
+            proxyReq.removeHeader('origin');
+            proxyReq.removeHeader('referer');
+          });
         }
       }
     }

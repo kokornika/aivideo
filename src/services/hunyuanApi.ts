@@ -34,10 +34,6 @@ export async function generateVideoWithHunyuan(description: string): Promise<Pre
   const REPLICATE_API_TOKEN = import.meta.env.VITE_REPLICATE_API_TOKEN;
   
   // Ellenőrizzük az API kulcs formátumát
-  if (!REPLICATE_API_TOKEN?.startsWith('r8_')) {
-    throw new Error('Érvénytelen API kulcs formátum. Az API kulcsnak "r8_" előtaggal kell kezdődnie.');
-  }
-
   const MAX_POLLING_ATTEMPTS = 60; // 1 minute with 1s intervals
   
   if (!REPLICATE_API_TOKEN) {
@@ -51,9 +47,12 @@ export async function generateVideoWithHunyuan(description: string): Promise<Pre
   };
 
   try {
-    const response = await fetch('/api/replicate', {
+    const response = await fetch('/api/replicate/predictions', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: {
+        'Authorization': `Bearer ${REPLICATE_API_TOKEN}`,
+        'Content-Type': 'application/json'
+      },
       body: JSON.stringify({
         version: "847dfa8b01e739637fc76f480ede0c1d76408e1d694b830b5dfb8e547bf98405",
         input: params
@@ -91,8 +90,12 @@ export async function generateVideoWithHunyuan(description: string): Promise<Pre
     
     while (result.status !== 'succeeded' && result.status !== 'failed' && result.status !== 'canceled') {
       await new Promise(resolve => setTimeout(resolve, 1000));
-      const pollResponse = await fetch(`/api/replicate-status?url=${encodeURIComponent(prediction.urls.get)}`, {
-        method: 'GET'
+      const pollUrl = prediction.urls.get.replace('https://api.replicate.com/v1', '/api/replicate');
+      const pollResponse = await fetch(pollUrl, {
+        method: 'GET',
+        headers: {
+          'Authorization': `Bearer ${REPLICATE_API_TOKEN}`
+        }
       });
       
       if (!pollResponse.ok) {
