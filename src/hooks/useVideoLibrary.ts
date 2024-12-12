@@ -1,12 +1,5 @@
-import { useState } from 'react';
-
-interface Video {
-  id: number;
-  title: string;
-  thumbnail: string;
-  url: string;
-  createdAt: string;
-}
+import { useState, useCallback } from 'react';
+import { create } from 'zustand';
 
 const INITIAL_VIDEOS = [
   {
@@ -39,12 +32,34 @@ const INITIAL_VIDEOS = [
   },
 ];
 
-export function useVideoLibrary() {
-  const [videos, setVideos] = useState<Video[]>(INITIAL_VIDEOS);
+interface Video {
+  id: number;
+  title: string;
+  thumbnail: string;
+  url: string;
+  createdAt: string;
+}
 
-  const addVideo = (video: Omit<Video, 'id'>) => {
-    setVideos(prev => [...prev, { ...video, id: Date.now() }]);
-  };
+interface VideoStore {
+  videos: Video[];
+  addVideo: (video: Omit<Video, 'id'>) => void;
+}
+
+export const useVideoStore = create<VideoStore>((set) => ({
+  videos: INITIAL_VIDEOS,
+  addVideo: (video) => set((state) => ({
+    videos: [...state.videos, { ...video, id: Date.now() }]
+  }))
+}));
+
+export const addVideoToLibrary = (video: Omit<Video, 'id'>) => {
+  useVideoStore.getState().addVideo(video);
+};
+
+
+export function useVideoLibrary() {
+  const videos = useVideoStore((state) => state.videos);
+  const addVideo = useVideoStore((state) => state.addVideo);
 
   return {
     videos,

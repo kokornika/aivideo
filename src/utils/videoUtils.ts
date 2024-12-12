@@ -1,13 +1,11 @@
 import { toast } from '../components/Toast';
 import { generateVideoWithHunyuan } from '../services/hunyuanApi';
-import { useVideoLibrary } from '../hooks/useVideoLibrary';
+import { addVideoToLibrary } from '../hooks/useVideoLibrary';
 
 export async function generateStoryboard(
   description: string,
   hardwareConfig: string
 ): Promise<void> {
-  const { addVideo } = useVideoLibrary();
-
   try {
     if (!description.trim()) {
       toast.error('Kérlek, add meg a videó leírását');
@@ -21,8 +19,7 @@ export async function generateStoryboard(
     if (result.status === 'succeeded') {
       if (result.output) {
         toast.success('A videó sikeresen elkészült!');
-        // Hozzáadjuk az új videót a könyvtárhoz
-        addVideo({
+        addVideoToLibrary({
           title: description.slice(0, 50) + (description.length > 50 ? '...' : ''),
           thumbnail: result.output,
           createdAt: new Date().toISOString(),
