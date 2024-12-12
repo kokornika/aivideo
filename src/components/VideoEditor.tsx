@@ -24,9 +24,20 @@ export function VideoEditor() {
 
   const handleHardwareChange = (value: string) => {
     setSelectedHardware(value);
+    // Frissítjük a videó paramétereket is
+    setVideoParams(prev => ({
+      ...prev,
+      video_length: 64 // Mindig 4 többszöröse legyen
+    }));
   };
 
   const handleParamChange = (param: string, value: string | number) => {
+    // Video length esetén ellenőrizzük, hogy 4 többszöröse-e
+    if (param === 'video_length') {
+      const newValue = Math.floor(Number(value) / 4) * 4;
+      value = Math.max(4, newValue); // Minimum 4
+    }
+
     setVideoParams(prev => ({
       ...prev,
       [param]: value
