@@ -40,7 +40,7 @@ export async function generateVideoWithHunyuan(description: string): Promise<Pre
   };
 
   try {
-    const response = await fetch('/.netlify/functions/replicate', {
+    const response = await fetch('/api/replicate', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'
@@ -82,7 +82,7 @@ export async function generateVideoWithHunyuan(description: string): Promise<Pre
     
     while (result.status !== 'succeeded' && result.status !== 'failed' && result.status !== 'canceled') {
       await new Promise(resolve => setTimeout(resolve, 1000));
-      const pollUrl = `/.netlify/functions/replicate-status/${prediction.id}`;
+      const pollUrl = `/api/replicate-status/${prediction.id}`;
       const pollResponse = await fetch(pollUrl, {
         method: 'GET',
         headers: { 'Content-Type': 'application/json' }
