@@ -44,18 +44,18 @@ export function VideoEditor() {
           <ToolButton icon={Type} onClick={() => {}} tooltip="Szöveg hozzáadása" />
           <ToolButton icon={Clock} label="16:9" />
           <ToolButton icon={Video} label="720p" />
-          <div className="relative group">
+          <div className="relative group/hardware">
             <ToolButton 
               icon={Cpu} 
               label={HARDWARE_OPTIONS.find(opt => opt.value === selectedHardware)?.label || 'GPU'} 
               tooltip="Hardver konfiguráció"
             />
-            <div className="absolute bottom-full right-0 mb-2 w-64 bg-gray-800 rounded-lg shadow-xl opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none group-hover:pointer-events-auto">
+            <div className="absolute bottom-full right-0 mb-2 w-64 bg-gray-800 rounded-lg shadow-xl opacity-0 group-hover/hardware:opacity-100 transition-opacity pointer-events-none group-hover/hardware:pointer-events-auto z-50">
               {HARDWARE_OPTIONS.map((option) => (
                 <button
                   key={option.value}
                   onClick={() => handleHardwareChange(option.value)}
-                  className={`w-full px-4 py-2 flex items-center justify-between hover:bg-gray-700 first:rounded-t-lg last:rounded-b-lg ${
+                  className={`w-full px-4 py-2 flex items-center justify-between hover:bg-gray-700 first:rounded-t-lg last:rounded-b-lg transition-colors ${
                     selectedHardware === option.value ? 'bg-blue-500/20 text-blue-400' : 'text-gray-300'
                   }`}
                 >
@@ -63,6 +63,7 @@ export function VideoEditor() {
                   <span className="text-sm opacity-75">{option.price}</span>
                 </button>
               ))}
+              <div className="absolute w-full h-4 bottom-0 translate-y-full" />
             </div>
           </div>
           <button 
