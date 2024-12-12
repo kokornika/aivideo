@@ -8,7 +8,7 @@ export function useVideoDescription() {
   const [videoParams, setVideoParams] = useState<Partial<VideoGenerationParams>>({
     width: 854,
     height: 480,
-    video_length: 33,  // 32 + 1, ahol 32 osztható 4-gyel
+    video_length: 65,  // 64 + 1, ahol 64 osztható 4-gyel
     infer_steps: 50,
     seed: Math.floor(Math.random() * 1000000),
     negative_prompt: ''
