@@ -18,9 +18,9 @@ export function VideoEditor() {
 
   const handleParamChange = (param: string, value: string | number) => {
     if (param === 'video_length') {
-      // A video_length-1 értéknek kell 4 többszörösének lennie
-      const adjustedLength = Math.floor((Number(value) - 1) / 4) * 4 + 1;
-      value = Math.max(4, Math.min(adjustedLength, 128)); // Minimum 4, maximum 128
+      // Biztosítjuk, hogy a video_length-1 4 többszöröse legyen
+      const targetLength = Math.floor(Number(value) / 4) * 4;
+      value = targetLength + 1; // +1 hogy megfeleljen a követelménynek
     }
 
     setVideoParams(prev => ({
@@ -41,9 +41,9 @@ export function VideoEditor() {
   const handleQualityChange = (quality: 'low' | 'medium' | 'high') => {
     setSelectedQuality(quality);
     const qualitySettings = {
-      low: { width: 480, height: 270, infer_steps: 30, video_length: 65 },  // 64+1
-      medium: { width: 854, height: 480, infer_steps: 50, video_length: 65 },  // 64+1
-      high: { width: 1280, height: 720, infer_steps: 70, video_length: 65 }  // 64+1
+      low: { width: 480, height: 270, infer_steps: 30, video_length: 33 },
+      medium: { width: 854, height: 480, infer_steps: 50, video_length: 33 },
+      high: { width: 1280, height: 720, infer_steps: 70, video_length: 33 }
     };
     
     setVideoParams(prev => ({
