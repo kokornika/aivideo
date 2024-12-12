@@ -1,13 +1,7 @@
 import React, { useState } from 'react';
-import { Plus, Video, Clock, Image, Type, Cpu, Settings2 } from 'lucide-react';
+import { Settings2 } from 'lucide-react';
 import { useVideoDescription } from '../hooks/useVideoDescription';
-
-const HARDWARE_OPTIONS = [
-  { value: 'gpu-h100', label: 'H100 GPU', price: '$5.49/hr' },
-  { value: 'gpu-h100-2x', label: '2x H100 GPU', price: '$10.98/hr' },
-  { value: 'gpu-h100-4x', label: '4x H100 GPU', price: '$21.96/hr' },
-  { value: 'gpu-h100-8x', label: '8x H100 GPU', price: '$43.92/hr' },
-];
+import { AspectRatio, Quality } from '../types';
 
 export function VideoEditor() {
   const { 
@@ -15,28 +9,47 @@ export function VideoEditor() {
     setDescription, 
     generateVideo, 
     isGenerating,
-    selectedHardware,
-    setSelectedHardware,
     videoParams,
     setVideoParams 
   } = useVideoDescription();
+  const [selectedAspectRatio, setSelectedAspectRatio] = useState<AspectRatio>('16:9');
+  const [selectedQuality, setSelectedQuality] = useState<Quality>('medium');
   const [showAdvanced, setShowAdvanced] = useState(false);
 
-  const handleHardwareChange = (value: string) => {
-    setSelectedHardware(value);
-  };
-
   const handleParamChange = (param: string, value: string | number) => {
-    // Video length esetén ellenőrizzük, hogy video_length-1 4 többszöröse-e
     if (param === 'video_length') {
-      const targetLength = Number(value) - 1;
-      const adjustedLength = Math.floor(targetLength / 4) * 4;
-      value = Math.max(5, Math.min(adjustedLength + 1, 129)); // Minimum 5 (4+1), maximum 129 (128+1)
+      // Biztosítjuk, hogy a video_length 4 többszöröse legyen
+      const adjustedLength = Math.floor(Number(value) / 4) * 4;
+      value = Math.max(4, Math.min(adjustedLength, 128)); // Minimum 4, maximum 128
     }
 
     setVideoParams(prev => ({
       ...prev,
       [param]: value
+    }));
+  };
+
+  const handleAspectRatioChange = (width: number, height: number, ratio: AspectRatio) => {
+    setSelectedAspectRatio(ratio);
+    setVideoParams(prev => ({
+      ...prev,
+      width,
+      height
+    }));
+  };
+
+  const handleQualityChange = (quality: 'low' | 'medium' | 'high') => {
+    setSelectedQuality(quality);
+    const qualitySettings = {
+      low: { width: 480, height: 270, infer_steps: 30 },
+      medium: { width: 854, height: 480, infer_steps: 50 },
+      high: { width: 1280, height: 720, infer_steps: 70 }
+    };
+    
+    setVideoParams(prev => ({
+      ...prev,
+      ...qualitySettings[quality],
+      video_length: 64  // Alapértelmezett hossz, ami 4 többszöröse
     }));
   };
 
@@ -62,39 +75,76 @@ export function VideoEditor() {
           />
         </div>
         <div className="flex items-center gap-2">
-          <ToolButton icon={Plus} onClick={() => {}} tooltip="Média hozzáadása" />
-          <ToolButton icon={Image} onClick={() => {}} tooltip="Kép hozzáadása" />
-          <ToolButton icon={Type} onClick={() => {}} tooltip="Szöveg hozzáadása" />
-          <ToolButton icon={Clock} label="16:9" />
-          <ToolButton icon={Video} label="720p" />
+          <div className="flex gap-2 px-2 py-1 bg-white/5 rounded-lg">
+            <button
+              onClick={() => handleAspectRatioChange(854, 480, '16:9')}
+              className={`px-2 py-1 rounded transition-colors ${
+                selectedAspectRatio === '16:9' 
+                  ? 'bg-blue-500/20 text-blue-400' 
+                  : 'hover:bg-white/10 text-gray-300'
+              }`}
+            >
+              16:9
+            </button>
+            <button
+              onClick={() => handleAspectRatioChange(480, 854, '9:16')}
+              className={`px-2 py-1 rounded transition-colors ${
+                selectedAspectRatio === '9:16' 
+                  ? 'bg-blue-500/20 text-blue-400' 
+                  : 'hover:bg-white/10 text-gray-300'
+              }`}
+            >
+              9:16
+            </button>
+            <button
+              onClick={() => handleAspectRatioChange(640, 640, '1:1')}
+              className={`px-2 py-1 rounded transition-colors ${
+                selectedAspectRatio === '1:1' 
+                  ? 'bg-blue-500/20 text-blue-400' 
+                  : 'hover:bg-white/10 text-gray-300'
+              }`}
+            >
+              1:1
+            </button>
+          </div>
+          <div className="flex gap-2 px-2 py-1 bg-white/5 rounded-lg">
+            <button
+              onClick={() => handleQualityChange('low')}
+              className={`px-2 py-1 rounded transition-colors ${
+                selectedQuality === 'low' 
+                  ? 'bg-blue-500/20 text-blue-400' 
+                  : 'hover:bg-white/10 text-gray-300'
+              }`}
+            >
+              Gyors
+            </button>
+            <button
+              onClick={() => handleQualityChange('medium')}
+              className={`px-2 py-1 rounded transition-colors ${
+                selectedQuality === 'medium' 
+                  ? 'bg-blue-500/20 text-blue-400' 
+                  : 'hover:bg-white/10 text-gray-300'
+              }`}
+            >
+              Normál
+            </button>
+            <button
+              onClick={() => handleQualityChange('high')}
+              className={`px-2 py-1 rounded transition-colors ${
+                selectedQuality === 'high' 
+                  ? 'bg-blue-500/20 text-blue-400' 
+                  : 'hover:bg-white/10 text-gray-300'
+              }`}
+            >
+              HD
+            </button>
+          </div>
           <ToolButton 
             icon={Settings2} 
             onClick={() => setShowAdvanced(!showAdvanced)}
             tooltip="Haladó beállítások"
             active={showAdvanced}
           />
-          <div className="relative group/hardware">
-            <ToolButton 
-              icon={Cpu} 
-              label={HARDWARE_OPTIONS.find(opt => opt.value === selectedHardware)?.label || 'H100 GPU'}
-              tooltip="Hardver konfiguráció"
-            />
-            <div className="absolute top-0 right-0 transform -translate-y-full mt-1 w-64 bg-gray-800 rounded-lg shadow-xl opacity-0 group-hover/hardware:opacity-100 transition-opacity pointer-events-none group-hover/hardware:pointer-events-auto z-50">
-              {HARDWARE_OPTIONS.map((option) => (
-                <button
-                  key={option.value}
-                  onClick={() => handleHardwareChange(option.value)}
-                  className={`w-full px-4 py-2 flex items-center justify-between hover:bg-gray-700 first:rounded-t-lg last:rounded-b-lg transition-colors ${
-                    selectedHardware === option.value ? 'bg-blue-500/20 text-blue-400' : 'text-gray-300'
-                  }`}
-                >
-                  <span>{option.label}</span>
-                  <span className="text-sm opacity-75">{option.price}</span>
-                </button>
-              ))}
-              <div className="absolute w-full h-2 top-full bg-transparent" />
-            </div>
-          </div>
           <button 
             onClick={generateVideo}
             disabled={!description.trim()}

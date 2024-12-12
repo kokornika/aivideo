@@ -5,11 +5,10 @@ import { VideoGenerationParams } from '../types';
 export function useVideoDescription() {
   const [description, setDescription] = useState('');
   const [isGenerating, setIsGenerating] = useState(false);
-  const [selectedHardware, setSelectedHardware] = useState('gpu-h100');
   const [videoParams, setVideoParams] = useState<Partial<VideoGenerationParams>>({
     width: 854,
     height: 480,
-    video_length: 69,  // video_length-1 legyen 4 többszöröse (68)
+    video_length: 64,  // 4 többszöröse
     infer_steps: 50,
     seed: Math.floor(Math.random() * 1000000),
     negative_prompt: ''
@@ -20,24 +19,25 @@ export function useVideoDescription() {
 
     try {
       setIsGenerating(true);
-      await generateStoryboard(description, {
-        hardware_config: selectedHardware as VideoGenerationParams['hardware_config'],
+      const params = {
         ...videoParams
+      };
+
+      await generateStoryboard(description, {
+        ...params
       });
     } catch (error) {
       console.error('Failed to generate video:', error);
     } finally {
       setIsGenerating(false);
     }
-  }, [description, isGenerating, selectedHardware, videoParams]);
+  }, [description, isGenerating, videoParams]);
 
   return {
     description,
     setDescription,
     generateVideo,
     isGenerating,
-    selectedHardware,
-    setSelectedHardware,
     videoParams,
     setVideoParams
   };

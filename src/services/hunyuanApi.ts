@@ -38,10 +38,10 @@ export async function generateVideoWithHunyuan(
   const MAX_POLLING_ATTEMPTS = 60; // 1 minute with 1s intervals
 
   const requestParams: VideoGenerationParams = {
-    ...DEFAULT_PARAMS,
-    ...params,
     prompt: description,
-    hardware_config: params.hardware_config || 'gpu-h100'
+    hardware_config: params.hardware_config || 'gpu-h100',
+    ...DEFAULT_PARAMS,
+    ...params
   };
 
   try {
