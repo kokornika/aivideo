@@ -11,7 +11,7 @@ interface PredictionResponse {
 
 interface VideoGenerationParams {
   prompt: string;
-  hardware_config?: 'gpu-h100' | 'gpu-h100-2x' | 'gpu-h100-4x' | 'gpu-h100-8x';
+  hardware_config: 'gpu-h100' | 'gpu-h100-2x' | 'gpu-h100-4x' | 'gpu-h100-8x';
   seed?: number;
   width?: number;
   height?: number;
@@ -23,7 +23,6 @@ interface VideoGenerationParams {
 }
 
 const DEFAULT_PARAMS: Partial<VideoGenerationParams> = {
-  hardware_config: 'gpu-h100',
   width: 854,
   height: 480,
   flow_shift: 5,
@@ -42,6 +41,7 @@ export async function generateVideoWithHunyuan(
     ...DEFAULT_PARAMS,
     ...params,
     prompt: description,
+    hardware_config: params.hardware_config || 'gpu-h100'
   };
 
   try {

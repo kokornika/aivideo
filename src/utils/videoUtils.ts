@@ -13,9 +13,12 @@ export async function generateStoryboard(
       return;
     }
 
-    // Ellenőrizzük, hogy a video_length 4 többszöröse-e
-    if (params.video_length && params.video_length % 4 !== 0) {
-      params.video_length = Math.floor(params.video_length / 4) * 4;
+    // Ellenőrizzük, hogy a video_length-1 4 többszöröse-e
+    if (params.video_length) {
+      const targetLength = params.video_length - 1;
+      if (targetLength % 4 !== 0) {
+        params.video_length = Math.floor(targetLength / 4) * 4 + 1;
+      }
     }
     toast.info('Videó generálása folyamatban... (Ez eltarthat néhány percig)');
     

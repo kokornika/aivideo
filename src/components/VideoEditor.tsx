@@ -27,10 +27,11 @@ export function VideoEditor() {
   };
 
   const handleParamChange = (param: string, value: string | number) => {
-    // Video length esetén ellenőrizzük, hogy 4 többszöröse-e
+    // Video length esetén ellenőrizzük, hogy video_length-1 4 többszöröse-e
     if (param === 'video_length') {
-      const newValue = Math.floor(Number(value) / 4) * 4;
-      value = Math.max(4, Math.min(newValue, 128)); // Minimum 4, maximum 128
+      const targetLength = Number(value) - 1;
+      const adjustedLength = Math.floor(targetLength / 4) * 4;
+      value = Math.max(5, Math.min(adjustedLength + 1, 129)); // Minimum 5 (4+1), maximum 129 (128+1)
     }
 
     setVideoParams(prev => ({
@@ -75,10 +76,10 @@ export function VideoEditor() {
           <div className="relative group/hardware">
             <ToolButton 
               icon={Cpu} 
-              label={HARDWARE_OPTIONS.find(opt => opt.value === selectedHardware)?.label || 'GPU'} 
+              label={HARDWARE_OPTIONS.find(opt => opt.value === selectedHardware)?.label || 'GPU'}
               tooltip="Hardver konfiguráció"
             />
-            <div className="absolute bottom-full right-0 mb-2 w-64 bg-gray-800 rounded-lg shadow-xl opacity-0 group-hover/hardware:opacity-100 transition-opacity pointer-events-none group-hover/hardware:pointer-events-auto z-50">
+            <div className="fixed bottom-[calc(100%+0.5rem)] right-0 w-64 bg-gray-800 rounded-lg shadow-xl opacity-0 group-hover/hardware:opacity-100 transition-opacity pointer-events-none group-hover/hardware:pointer-events-auto z-50">
               {HARDWARE_OPTIONS.map((option) => (
                 <button
                   key={option.value}
@@ -91,7 +92,6 @@ export function VideoEditor() {
                   <span className="text-sm opacity-75">{option.price}</span>
                 </button>
               ))}
-              <div className="absolute w-full h-4 bottom-0 translate-y-full" />
             </div>
           </div>
           <button 

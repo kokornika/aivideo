@@ -9,7 +9,7 @@ export function useVideoDescription() {
   const [videoParams, setVideoParams] = useState<Partial<VideoGenerationParams>>({
     width: 854,
     height: 480,
-    video_length: 64,  // 4 többszöröse
+    video_length: 65,  // video_length-1 legyen 4 többszöröse (64)
     infer_steps: 50,
     seed: Math.floor(Math.random() * 1000000),
     negative_prompt: ''
