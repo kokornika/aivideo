@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Plus, Video, Clock, Image, Type, Cpu } from 'lucide-react';
+import { Plus, Video, Clock, Image, Type, Cpu, Settings2 } from 'lucide-react';
 import { useVideoDescription } from '../hooks/useVideoDescription';
 
 const HARDWARE_OPTIONS = [
@@ -12,9 +12,25 @@ const HARDWARE_OPTIONS = [
 export function VideoEditor() {
   const { description, setDescription, generateVideo, isGenerating } = useVideoDescription();
   const [selectedHardware, setSelectedHardware] = useState('gpu-h100');
+  const [showAdvanced, setShowAdvanced] = useState(false);
+  const [videoParams, setVideoParams] = useState({
+    width: 854,
+    height: 480,
+    video_length: 128,
+    infer_steps: 50,
+    seed: Math.floor(Math.random() * 1000000),
+    negative_prompt: ''
+  });
 
   const handleHardwareChange = (value: string) => {
     setSelectedHardware(value);
+  };
+
+  const handleParamChange = (param: string, value: string | number) => {
+    setVideoParams(prev => ({
+      ...prev,
+      [param]: value
+    }));
   };
 
   return (
@@ -44,6 +60,12 @@ export function VideoEditor() {
           <ToolButton icon={Type} onClick={() => {}} tooltip="Szöveg hozzáadása" />
           <ToolButton icon={Clock} label="16:9" />
           <ToolButton icon={Video} label="720p" />
+          <ToolButton 
+            icon={Settings2} 
+            onClick={() => setShowAdvanced(!showAdvanced)}
+            tooltip="Haladó beállítások"
+            active={showAdvanced}
+          />
           <div className="relative group/hardware">
             <ToolButton 
               icon={Cpu} 
@@ -75,6 +97,70 @@ export function VideoEditor() {
           </button>
         </div>
       </div>
+      {showAdvanced && (
+        <div className="mt-4 grid grid-cols-3 gap-4">
+          <div>
+            <label className="block text-sm text-gray-400 mb-1">Szélesség (px)</label>
+            <input
+              type="number"
+              value={videoParams.width}
+              onChange={(e) => handleParamChange('width', parseInt(e.target.value))}
+              className="w-full bg-white/5 border border-white/10 rounded px-3 py-1.5 text-white"
+              min="1"
+            />
+          </div>
+          <div>
+            <label className="block text-sm text-gray-400 mb-1">Magasság (px)</label>
+            <input
+              type="number"
+              value={videoParams.height}
+              onChange={(e) => handleParamChange('height', parseInt(e.target.value))}
+              className="w-full bg-white/5 border border-white/10 rounded px-3 py-1.5 text-white"
+              min="1"
+            />
+          </div>
+          <div>
+            <label className="block text-sm text-gray-400 mb-1">Videó hossza (képkocka)</label>
+            <input
+              type="number"
+              value={videoParams.video_length}
+              onChange={(e) => handleParamChange('video_length', parseInt(e.target.value))}
+              className="w-full bg-white/5 border border-white/10 rounded px-3 py-1.5 text-white"
+              min="4"
+              step="4"
+            />
+          </div>
+          <div>
+            <label className="block text-sm text-gray-400 mb-1">Következtetési lépések</label>
+            <input
+              type="number"
+              value={videoParams.infer_steps}
+              onChange={(e) => handleParamChange('infer_steps', parseInt(e.target.value))}
+              className="w-full bg-white/5 border border-white/10 rounded px-3 py-1.5 text-white"
+              min="1"
+            />
+          </div>
+          <div>
+            <label className="block text-sm text-gray-400 mb-1">Seed érték</label>
+            <input
+              type="number"
+              value={videoParams.seed}
+              onChange={(e) => handleParamChange('seed', parseInt(e.target.value))}
+              className="w-full bg-white/5 border border-white/10 rounded px-3 py-1.5 text-white"
+            />
+          </div>
+          <div className="col-span-3">
+            <label className="block text-sm text-gray-400 mb-1">Negatív prompt</label>
+            <input
+              type="text"
+              value={videoParams.negative_prompt}
+              onChange={(e) => handleParamChange('negative_prompt', e.target.value)}
+              placeholder="Amit nem szeretnél látni a videóban..."
+              className="w-full bg-white/5 border border-white/10 rounded px-3 py-1.5 text-white"
+            />
+          </div>
+        </div>
+      )}
     </div>
   );
 }
@@ -84,14 +170,15 @@ interface ToolButtonProps {
   label?: string;
   tooltip?: string;
   onClick?: () => void;
+  active?: boolean;
 }
 
-function ToolButton({ icon: Icon, label, tooltip, onClick }: ToolButtonProps) {
+function ToolButton({ icon: Icon, label, tooltip, onClick, active }: ToolButtonProps) {
   return (
     <button
       onClick={onClick}
       title={tooltip}
-      className="flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-white/5 text-gray-300 relative group"
+      className={`flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-white/5 text-gray-300 relative group ${active ? 'bg-blue-500/20 text-blue-400' : ''}`}
     >
       <Icon className="w-5 h-5" />
       {label && <span>{label}</span>}

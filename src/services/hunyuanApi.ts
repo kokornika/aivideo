@@ -28,17 +28,20 @@ const DEFAULT_PARAMS: Partial<VideoGenerationParams> = {
   height: 480,
   flow_shift: 5,
   infer_steps: 30,
-  video_length: 64,
+  video_length: 64, // Must be a multiple of 4
   embedded_guidance_scale: 6
 };
 
-export async function generateVideoWithHunyuan(description: string): Promise<PredictionResponse> {
+export async function generateVideoWithHunyuan(
+  description: string,
+  params: Partial<VideoGenerationParams>
+): Promise<PredictionResponse> {
   const MAX_POLLING_ATTEMPTS = 60; // 1 minute with 1s intervals
 
-  const params: VideoGenerationParams = {
+  const requestParams: VideoGenerationParams = {
     ...DEFAULT_PARAMS,
+    ...params,
     prompt: description,
-    negative_prompt: "blurry, low quality, distorted"
   };
 
   try {
@@ -49,7 +52,7 @@ export async function generateVideoWithHunyuan(description: string): Promise<Pre
       },
       body: JSON.stringify({
         version: "847dfa8b01e739637fc76f480ede0c1d76408e1d694b830b5dfb8e547bf98405",
-        input: params
+        input: requestParams
       })
     });
 

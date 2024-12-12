@@ -1,4 +1,5 @@
 import { useState, useCallback } from 'react';
+import { useMemo } from 'react';
 import { create } from 'zustand';
 
 const INITIAL_VIDEOS = [
@@ -42,13 +43,23 @@ interface Video {
 
 interface VideoStore {
   videos: Video[];
+  currentView: 'recent' | 'featured' | 'saved' | 'all' | 'favorites' | 'uploads';
   addVideo: (video: Omit<Video, 'id'>) => void;
+  setCurrentView: (view: VideoStore['currentView']) => void;
+  toggleFavorite: (id: number) => void;
 }
 
 export const useVideoStore = create<VideoStore>((set) => ({
   videos: INITIAL_VIDEOS,
+  currentView: 'featured',
   addVideo: (video) => set((state) => ({
     videos: [...state.videos, { ...video, id: Date.now() }]
+  })),
+  setCurrentView: (view) => set({ currentView: view }),
+  toggleFavorite: (id) => set((state) => ({
+    videos: state.videos.map(video =>
+      video.id === id ? { ...video, isFavorite: !video.isFavorite } : video
+    )
   }))
 }));
 
@@ -59,10 +70,36 @@ export const addVideoToLibrary = (video: Omit<Video, 'id'>) => {
 
 export function useVideoLibrary() {
   const videos = useVideoStore((state) => state.videos);
+  const currentView = useVideoStore((state) => state.currentView);
   const addVideo = useVideoStore((state) => state.addVideo);
+  const setCurrentView = useVideoStore((state) => state.setCurrentView);
+  const toggleFavorite = useVideoStore((state) => state.toggleFavorite);
+
+  const filteredVideos = useMemo(() => {
+    switch (currentView) {
+      case 'recent':
+        return [...videos].sort((a, b) => 
+          new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+        );
+      case 'featured':
+        return videos.filter(video => video.isFeatured);
+      case 'saved':
+        return videos.filter(video => video.isSaved);
+      case 'favorites':
+        return videos.filter(video => video.isFavorite);
+      case 'uploads':
+        return videos.filter(video => video.isUploaded);
+      case 'all':
+      default:
+        return videos;
+    }
+  }, [videos, currentView]);
 
   return {
-    videos,
+    videos: filteredVideos,
+    currentView,
     addVideo,
+    setCurrentView,
+    toggleFavorite,
   };
 }

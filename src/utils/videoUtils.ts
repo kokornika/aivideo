@@ -4,7 +4,7 @@ import { addVideoToLibrary } from '../hooks/useVideoLibrary';
 
 export async function generateStoryboard(
   description: string,
-  hardwareConfig: string
+  params: Partial<VideoGenerationParams>
 ): Promise<void> {
   try {
     if (!description.trim()) {
@@ -14,7 +14,7 @@ export async function generateStoryboard(
 
     toast.info('Videó generálása folyamatban... (Ez eltarthat néhány percig)');
     
-    const result = await generateVideoWithHunyuan(description, hardwareConfig);
+    const result = await generateVideoWithHunyuan(description, params);
     
     if (result.status === 'succeeded') {
       if (result.output) {
