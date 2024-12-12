@@ -31,14 +31,7 @@ const DEFAULT_PARAMS: Partial<VideoGenerationParams> = {
 };
 
 export async function generateVideoWithHunyuan(description: string): Promise<PredictionResponse> {
-  const REPLICATE_API_TOKEN = import.meta.env.VITE_REPLICATE_API_TOKEN;
-  
-  // Ellenőrizzük az API kulcs formátumát
   const MAX_POLLING_ATTEMPTS = 60; // 1 minute with 1s intervals
-  
-  if (!REPLICATE_API_TOKEN) {
-    throw new Error('Az API kulcs nincs beállítva. Kérlek, add meg a VITE_REPLICATE_API_TOKEN környezeti változót.');
-  }
 
   const params: VideoGenerationParams = {
     ...DEFAULT_PARAMS,
@@ -50,7 +43,6 @@ export async function generateVideoWithHunyuan(description: string): Promise<Pre
     const response = await fetch('/api/replicate/predictions', {
       method: 'POST',
       headers: {
-        'Authorization': `Bearer ${REPLICATE_API_TOKEN}`,
         'Content-Type': 'application/json'
       },
       body: JSON.stringify({
@@ -93,9 +85,7 @@ export async function generateVideoWithHunyuan(description: string): Promise<Pre
       const pollUrl = prediction.urls.get.replace('https://api.replicate.com/v1', '/api/replicate');
       const pollResponse = await fetch(pollUrl, {
         method: 'GET',
-        headers: {
-          'Authorization': `Bearer ${REPLICATE_API_TOKEN}`
-        }
+        headers: { 'Content-Type': 'application/json' }
       });
       
       if (!pollResponse.ok) {

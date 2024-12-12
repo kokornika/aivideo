@@ -3,7 +3,7 @@ import { Handler } from '@netlify/functions';
 const handler: Handler = async (event) => {
   const headers = {
     'Access-Control-Allow-Origin': '*',
-    'Access-Control-Allow-Headers': 'Content-Type',
+    'Access-Control-Allow-Headers': 'Content-Type, Authorization',
     'Access-Control-Allow-Methods': 'GET, OPTIONS',
   };
 
@@ -16,9 +16,10 @@ const handler: Handler = async (event) => {
   }
 
   const REPLICATE_API_TOKEN = process.env.REPLICATE_API_TOKEN;
-  const statusUrl = event.queryStringParameters?.url;
+  const predictionId = event.path.split('/').pop();
 
-  if (!REPLICATE_API_TOKEN || !statusUrl) {
+  if (!REPLICATE_API_TOKEN || !predictionId) {
+    console.error('Hiányzó paraméterek:', { predictionId });
     return {
       statusCode: 400,
       headers,
@@ -27,9 +28,10 @@ const handler: Handler = async (event) => {
   }
 
   try {
-    const response = await fetch(statusUrl, {
+    const response = await fetch(`https://api.replicate.com/v1/predictions/${predictionId}`, {
       headers: {
         'Authorization': `Bearer ${REPLICATE_API_TOKEN}`,
+        'Content-Type': 'application/json'
       },
     });
 

@@ -4,7 +4,7 @@ const handler: Handler = async (event) => {
   // CORS headers
   const headers = {
     'Access-Control-Allow-Origin': '*',
-    'Access-Control-Allow-Headers': 'Content-Type',
+    'Access-Control-Allow-Headers': 'Content-Type, Authorization',
     'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
   };
 
@@ -20,8 +20,10 @@ const handler: Handler = async (event) => {
   const REPLICATE_API_TOKEN = process.env.REPLICATE_API_TOKEN;
   
   if (!REPLICATE_API_TOKEN) {
+    console.error('API kulcs nincs beállítva a környezeti változókban');
     return {
       statusCode: 500,
+      headers,
       body: JSON.stringify({ error: 'API kulcs nincs beállítva' }),
     };
   }
