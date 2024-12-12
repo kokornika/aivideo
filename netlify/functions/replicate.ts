@@ -1,14 +1,13 @@
 import { Handler } from '@netlify/functions';
+import fetch from 'node-fetch';
 
 const handler: Handler = async (event) => {
-  // CORS headers
   const headers = {
     'Access-Control-Allow-Origin': '*',
     'Access-Control-Allow-Headers': 'Content-Type, Authorization',
     'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
   };
 
-  // Handle preflight requests
   if (event.httpMethod === 'OPTIONS') {
     return {
       statusCode: 200,
@@ -95,5 +94,6 @@ const handler: Handler = async (event) => {
       }),
     };
   }
+};
 
 export { handler };

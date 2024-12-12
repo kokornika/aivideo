@@ -1,4 +1,5 @@
 import { Handler } from '@netlify/functions';
+import fetch from 'node-fetch';
 
 const handler: Handler = async (event) => {
   const headers = {
@@ -49,6 +50,6 @@ const handler: Handler = async (event) => {
       body: JSON.stringify({ error: 'Szerver hiba történt' }),
     };
   }
-}
+};
 
 export { handler };
