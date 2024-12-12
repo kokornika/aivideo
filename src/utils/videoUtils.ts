@@ -5,7 +5,7 @@ import { VideoGenerationParams } from '../types';
 
 export async function generateStoryboard(
   description: string,
-  hardware: string
+  params: Partial<VideoGenerationParams>
 ): Promise<void> {
   try {
     if (!description.trim()) {
@@ -13,18 +13,10 @@ export async function generateStoryboard(
       return;
     }
 
-    // Alapértelmezett paraméterek
-    const params: VideoGenerationParams = {
-      hardware_config: hardware as 'gpu-h100' | 'gpu-h100-2x' | 'gpu-h100-4x' | 'gpu-h100-8x',
-      width: 854,
-      height: 480,
-      video_length: 64, // 4 többszöröse
-      infer_steps: 50,
-      seed: Math.floor(Math.random() * 1000000),
-      negative_prompt: '',
-      flow_shift: 5,
-      embedded_guidance_scale: 6
-    };
+    // Ellenőrizzük, hogy a video_length 4 többszöröse-e
+    if (params.video_length && params.video_length % 4 !== 0) {
+      params.video_length = Math.floor(params.video_length / 4) * 4;
+    }
     toast.info('Videó generálása folyamatban... (Ez eltarthat néhány percig)');
     
     const result = await generateVideoWithHunyuan(description, params);

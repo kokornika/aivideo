@@ -10,32 +10,27 @@ const HARDWARE_OPTIONS = [
 ];
 
 export function VideoEditor() {
-  const { description, setDescription, generateVideo, isGenerating } = useVideoDescription();
-  const [selectedHardware, setSelectedHardware] = useState('gpu-h100');
+  const { 
+    description, 
+    setDescription, 
+    generateVideo, 
+    isGenerating,
+    selectedHardware,
+    setSelectedHardware,
+    videoParams,
+    setVideoParams 
+  } = useVideoDescription();
   const [showAdvanced, setShowAdvanced] = useState(false);
-  const [videoParams, setVideoParams] = useState({
-    width: 854,
-    height: 480,
-    video_length: 128,
-    infer_steps: 50,
-    seed: Math.floor(Math.random() * 1000000),
-    negative_prompt: ''
-  });
 
   const handleHardwareChange = (value: string) => {
     setSelectedHardware(value);
-    // Frissítjük a videó paramétereket is
-    setVideoParams(prev => ({
-      ...prev,
-      video_length: 64 // Mindig 4 többszöröse legyen
-    }));
   };
 
   const handleParamChange = (param: string, value: string | number) => {
     // Video length esetén ellenőrizzük, hogy 4 többszöröse-e
     if (param === 'video_length') {
       const newValue = Math.floor(Number(value) / 4) * 4;
-      value = Math.max(4, newValue); // Minimum 4
+      value = Math.max(4, Math.min(newValue, 128)); // Minimum 4, maximum 128
     }
 
     setVideoParams(prev => ({
